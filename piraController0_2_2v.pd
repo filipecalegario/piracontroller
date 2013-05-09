@@ -1,0 +1,476 @@
+#N canvas 230 269 431 234 10;
+#N canvas 0 22 1280 748 subpatch 0;
+#X obj 404 720 spigot;
+#X msg 817 522 bang;
+#X obj 505 682 bonk~;
+#X msg 504 749 print;
+#X obj 492 536 adc~;
+#X msg 673 809 \; pd dsp 1;
+#X obj 322 720 spigot;
+#N canvas 325 176 604 404 synth 0;
+#X obj 167 14 r bonk-cooked;
+#X obj 112 49 unpack;
+#X obj 112 99 * 12;
+#X obj 112 124 div 7;
+#X obj 112 74 + 1;
+#X obj 112 174 mtof;
+#X obj 112 224 osc~;
+#X obj 112 249 cos~;
+#X obj 112 149 + 47;
+#X obj 209 247 line~;
+#X obj 209 272 *~;
+#X obj 209 297 lop~ 500;
+#X obj 112 274 *~;
+#X obj 103 361 dac~;
+#X obj 253 165 dbtorms;
+#X obj 253 115 * 0.5;
+#X obj 253 140 + 50;
+#X obj 211 189 f;
+#X msg 173 159 bang;
+#X obj 258 83 inlet;
+#X obj 111 307 hip~ 5;
+#X msg 34 24 0 60;
+#X obj 112 199 sig~;
+#X msg 209 222 \$1 \, 0 200;
+#X obj 18 47 inlet;
+#X connect 0 0 1 0;
+#X connect 1 0 4 0;
+#X connect 2 0 3 0;
+#X connect 3 0 8 0;
+#X connect 4 0 2 0;
+#X connect 5 0 18 0;
+#X connect 5 0 22 0;
+#X connect 6 0 7 0;
+#X connect 7 0 12 0;
+#X connect 8 0 5 0;
+#X connect 9 0 10 0;
+#X connect 9 0 10 1;
+#X connect 10 0 11 0;
+#X connect 11 0 12 1;
+#X connect 12 0 20 0;
+#X connect 14 0 17 1;
+#X connect 15 0 16 0;
+#X connect 16 0 14 0;
+#X connect 17 0 23 0;
+#X connect 18 0 17 0;
+#X connect 19 0 15 0;
+#X connect 20 0 13 0;
+#X connect 20 0 13 1;
+#X connect 21 0 1 0;
+#X connect 22 0 6 0;
+#X connect 23 0 9 0;
+#X connect 24 0 1 0;
+#X restore 944 808 pd synth;
+#X floatatom 944 785 0 0 0 0 - - -;
+#X msg 944 755 0;
+#X msg 975 755 90;
+#X text 661 775 click here;
+#X text 662 788 to start DSP;
+#X text 845 754 output volume;
+#X text 859 772 (0-100);
+#X msg 143 463 mask 4 0.7;
+#X text 255 345 Describes how energy in each frequency band masks later
+energy in the band. Here the masking is total for 4 analysis periods
+and then drops by 0.7 each period.;
+#X msg 828 562 debug 0;
+#X text 583 559 turn debugging on or off.;
+#X obj 371 721 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 65 209 tgl 15 0 empty empty Print 17 7 0 10 -262144 -1 -1 1
+1;
+#X obj 404 750 print cooked;
+#X obj 322 750 print raw;
+#X text 655 314 Minimum "velocity" to output (quieter notes are ignored.)
+;
+#X obj 355 785 s bonk-cooked;
+#X msg 839 627 print 1;
+#X text 911 624 print out filterbank settings;
+#N canvas 528 22 699 717 creation-arguments 0;
+#X text 228 14 creation arguments for bonk~;
+#X text 70 272 -npts 256;
+#X text 44 244 default value:;
+#X text 70 308 -hop 128;
+#X text 70 342 -nfilters 11;
+#X text 68 380 -halftones 6;
+#X text 76 514 -overlap 1;
+#X text 79 567 -firstbin 1;
+#X text 71 454 -minbandwidth 1.5;
+#X text 122 147 All frequency parameters are specified in 'bins'. One
+bin is the sample rate divided by the window size. The minimum possible
+bandwidth is 1.5 bins. Higher bandwidths give numerically more robust
+outputs.;
+#X text 43 229 Arguments and;
+#X text 212 270 window size in points;
+#X text 210 306 analysis period ("hop size") in points;
+#X text 212 340 number of filters to use;
+#X text 212 379 desired bandwidth of filters in halftones \, effective
+in the exponentially spaced region. (At lower center frequencies the
+bandwidth is supported by the "minbandwidth" parameter below).;
+#X text 212 511 overlap factor between filters. If 1 \, the filters
+are spaced to line up at their half-power points. Other values specify
+more or fewer filters proportionally.;
+#X text 121 49 bonk~ uses a filterbank whose center frequencies are
+spaced equally at low frequencies and proportionally at high ones -
+i.e. \, they increase linearly \, then exponentially. They are determined
+by the filters' bandwidths and overlap. The bandwidths are specified
+proportionally to frequency but bounded below by a specified minimum.
+;
+#X text 210 455 minimum bandwidth in bins. If the bandwidth specified
+by "halftones" is smaller than this \, this value is used. This must
+be at least 1.5.;
+#X text 212 567 center frequency \, in bins \, of the lowest filter.
+The others are computed from this.;
+#X restore 169 642 pd creation-arguments;
+#N canvas 705 88 579 589 templates 0;
+#X msg 76 197 learn 0;
+#X msg 76 227 forget;
+#X msg 76 257 write templates.txt;
+#X msg 76 287 read templates.txt;
+#X msg 76 107 debounce 0;
+#X obj 62 431 outlet;
+#X text 155 133 Forget all templates and start learning new ones. The
+argument gives the number of times you will hit each instrument (10
+recommended.) Turn on the output volume above for audible feedback
+as you train Bonk. "Learn 0" exits learn mode.;
+#X text 155 217 Forget the last template. In Learn mode \, use "forget"
+to erase and record over a template.;
+#X text 220 253 Write templates to a file in text-editable format.
+;
+#X text 221 283 Read templates from a file.;
+#X text 157 104 Minimum time (msec) between attacks in learn mode;
+#X msg 76 137 learn 10;
+#X connect 0 0 5 0;
+#X connect 1 0 5 0;
+#X connect 2 0 5 0;
+#X connect 3 0 5 0;
+#X connect 4 0 5 0;
+#X connect 11 0 5 0;
+#X restore 591 693 pd templates;
+#X text 362 421 number of frames over which to measure growth;
+#X text 695 690 more messages for managing templates;
+#X text 329 456 Turn spew mode on/off;
+#X msg 703 366 useloudness 0;
+#X text 812 377 experimental: use alternative loudness units;
+#X text 331 251 BONK~ - attack detection and spectral envelope measurement
+;
+#X text 809 837 Updated for Pd version 0.42;
+#X text 875 596 Print out settings and templates.;
+#X msg 397 508 spew 0;
+#X msg 360 480 spew 1;
+#X msg 742 401 useloudness 1;
+#X text -46 275 comment;
+#X text 710 510 comment;
+#X obj 71 103 hsl 128 15 0 127 0 1 empty empty Sensibilidade -2 -8
+0 10 -258113 -1 -1 1000 0;
+#X msg 61 504 minvel \$1;
+#X floatatom 71 473 5 0 0 0 - - -;
+#X obj 29 308 hsl 128 15 0 1 0 0 empty empty Threshold_Mínimo -2 -8
+0 10 -4160 -1 -1 0 1;
+#X obj 32 351 hsl 128 15 0 1 0 0 empty empty Threshold_Máximo -2 -8
+0 10 -159808 -1 -1 0 1;
+#X msg 55 582 thresh 2.5 5;
+#X obj -37 723 pack f f;
+#X obj -24 697 t b f;
+#X obj -37 746 list prepend thresh;
+#X obj -38 768 list trim;
+#X obj -33 515 * 25;
+#X obj 2 548 * 25;
+#X obj 11 581 + 25;
+#X text 184 719 comment;
+#X floatatom -46 574 5 0 0 0 - - -;
+#X floatatom 3 617 5 0 0 0 - - -;
+#X obj 922 719 loadbang;
+#X msg 238 494 attack-frames 1;
+#X obj 64 183 tgl 15 0 empty empty Monitor 17 7 0 10 -262144 -1 -1
+0 1;
+#X obj 851 727 * 90;
+#X obj 258 185 tgl 15 0 empty empty Send_MIDI 17 7 0 10 -262144 -1
+-1 1 1;
+#X text 61 63 PIRA CONTROLLER;
+#N canvas 37 55 1097 684 gravando 0;
+#X obj 215 238 notein;
+#X floatatom 277 522 5 0 0 0 - - -;
+#X floatatom 313 521 5 0 0 0 - - -;
+#X obj 57 390 print;
+#X floatatom 188 280 5 0 0 0 - - -;
+#X obj 232 281 > 0;
+#X obj 186 321 spigot;
+#X obj 432 545 makenote;
+#X obj 398 629 noteout;
+#X msg 182 380 add \$1;
+#X obj 447 503 textfile;
+#X obj 603 581 print list;
+#X msg 816 74 print;
+#X msg 735 472 rewind;
+#X msg 402 321 bang;
+#X obj 182 408 spigot;
+#X obj 106 95 tgl 15 0 empty empty RECORD 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 210 435 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 361 434 spigot;
+#X obj 374 398 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 284 60 bng 15 250 50 0 empty empty TRIGGER 17 7 0 10 -262144
+-1 -1;
+#X obj 686 77 hradio 15 1 0 8 empty empty empty 0 -8 0 10 -262144 -1
+-1 0;
+#X floatatom 683 171 5 0 0 0 - - -;
+#X msg 673 312 \$1;
+#X obj 673 343 makefilename file%d.txt;
+#X msg 673 376 write \$1;
+#X obj 588 157 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X floatatom 860 194 5 0 0 0 - - -;
+#X msg 860 211 \$1;
+#X obj 860 228 makefilename file%d.txt;
+#X msg 926 413 read \$1;
+#X obj 760 543 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 539 235 spigot;
+#X obj 722 238 spigot;
+#X msg 909 153 bang;
+#X obj 909 104 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 909 138 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X msg 462 458 clear;
+#X obj 581 359 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 366 59 bng 15 250 50 0 empty empty CLEAR 17 7 0 10 -262144 -1
+-1;
+#X msg 620 86 bang;
+#X obj 593 88 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 591 66 delay 100;
+#X obj 909 120 delay 100;
+#X obj 474 110 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 472 88 delay 200;
+#X obj 231 165 == 0;
+#X obj 267 219 spigot;
+#X obj 414 95 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 449 145 spigot;
+#X obj 51 305 spigot;
+#X obj 102 278 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+1;
+#X obj 51 219 loadbang;
+#X obj 91 28 inlet;
+#X obj 156 27 inlet;
+#X obj 402 18 inlet;
+#X obj 717 24 inlet;
+#X obj 829 27 inlet;
+#X floatatom 449 591 5 0 0 0 - - -;
+#X floatatom 496 597 5 0 0 0 - - -;
+#X floatatom 397 517 5 0 0 0 - - -;
+#X msg 349 489 127;
+#X obj 1010 440 inlet;
+#X obj 528 635 spigot;
+#X obj 541 599 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+1;
+#X obj 44 29 inlet;
+#X floatatom 402 488 5 0 0 0 - - -;
+#X msg 376 462 100;
+#X msg 844 559 bang;
+#X obj 844 510 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 844 544 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 844 526 delay 1;
+#X obj 3 62 inlet;
+#X connect 0 0 4 0;
+#X connect 0 1 1 0;
+#X connect 0 1 5 0;
+#X connect 0 2 2 0;
+#X connect 1 0 8 1;
+#X connect 4 0 6 0;
+#X connect 4 0 18 0;
+#X connect 5 0 6 1;
+#X connect 6 0 9 0;
+#X connect 6 0 50 0;
+#X connect 7 0 58 0;
+#X connect 7 0 63 0;
+#X connect 7 1 8 1;
+#X connect 7 1 59 0;
+#X connect 9 0 15 0;
+#X connect 10 0 11 0;
+#X connect 10 0 7 0;
+#X connect 10 1 31 0;
+#X connect 10 1 69 0;
+#X connect 12 0 10 0;
+#X connect 13 0 10 0;
+#X connect 14 0 10 0;
+#X connect 15 0 10 0;
+#X connect 15 0 17 0;
+#X connect 16 0 15 1;
+#X connect 16 0 19 0;
+#X connect 16 0 32 1;
+#X connect 16 0 33 1;
+#X connect 16 0 46 0;
+#X connect 17 0 26 0;
+#X connect 18 0 8 0;
+#X connect 19 0 18 1;
+#X connect 20 0 14 0;
+#X connect 21 0 27 0;
+#X connect 21 0 22 0;
+#X connect 21 0 35 0;
+#X connect 21 0 38 0;
+#X connect 22 0 33 0;
+#X connect 23 0 24 0;
+#X connect 24 0 25 0;
+#X connect 25 0 10 0;
+#X connect 26 0 32 0;
+#X connect 27 0 28 0;
+#X connect 28 0 29 0;
+#X connect 29 0 30 0;
+#X connect 30 0 13 0;
+#X connect 30 0 10 0;
+#X connect 31 0 13 0;
+#X connect 32 0 22 0;
+#X connect 33 0 23 0;
+#X connect 34 0 27 0;
+#X connect 35 0 43 0;
+#X connect 36 0 34 0;
+#X connect 37 0 10 0;
+#X connect 38 0 37 0;
+#X connect 39 0 37 0;
+#X connect 39 0 42 0;
+#X connect 39 0 45 0;
+#X connect 39 0 47 0;
+#X connect 40 0 22 0;
+#X connect 41 0 40 0;
+#X connect 42 0 41 0;
+#X connect 43 0 36 0;
+#X connect 44 0 49 0;
+#X connect 45 0 44 0;
+#X connect 46 0 47 1;
+#X connect 47 0 16 0;
+#X connect 47 0 48 0;
+#X connect 48 0 49 1;
+#X connect 49 0 16 0;
+#X connect 49 0 48 0;
+#X connect 50 0 3 0;
+#X connect 51 0 50 1;
+#X connect 52 0 51 0;
+#X connect 52 0 61 0;
+#X connect 52 0 67 0;
+#X connect 53 0 16 0;
+#X connect 54 0 20 0;
+#X connect 55 0 39 0;
+#X connect 56 0 21 0;
+#X connect 57 0 12 0;
+#X connect 60 0 7 1;
+#X connect 61 0 60 0;
+#X connect 62 0 60 0;
+#X connect 63 0 8 0;
+#X connect 64 0 63 1;
+#X connect 65 0 64 0;
+#X connect 66 0 7 2;
+#X connect 67 0 66 0;
+#X connect 68 0 10 0;
+#X connect 69 0 71 0;
+#X connect 70 0 68 0;
+#X connect 71 0 70 0;
+#X connect 72 0 8 2;
+#X restore 504 223 pd gravando;
+#X obj 258 78 hradio 20 1 0 8 empty empty Slots_de_Gravação 0 -8
+0 10 -159808 -262144 -1 0;
+#X obj 255 127 tgl 20 0 empty empty Record 23 10 0 10 -262144 -1 -1
+0 1;
+#X obj 349 131 bng 15 250 50 0 empty bonk-cooked Trigger 17 7 0 10
+-262144 -1 -1;
+#X obj 258 157 bng 15 250 50 0 empty empty Clear 17 7 0 10 -262144
+-1 -1;
+#X obj 349 157 bng 15 250 50 0 empty empty Print_Lista 17 7 0 10 -262144
+-1 -1;
+#X obj 572 48 r bonk-cooked;
+#X obj 572 93 unpack;
+#X floatatom 619 155 5 0 0 0 - - -;
+#X floatatom 169 122 5 0 0 0 - - -;
+#X obj 275 225 hsl 128 15 0 50 0 0 empty empty MIDI_Velocity -2 -8
+0 10 -4032 -1 -1 12700 1;
+#X obj 686 153 +;
+#X floatatom 642 195 5 0 0 0 - - -;
+#X obj 151 182 tgl 15 0 empty empty ENTRADA_1 17 7 0 10 -262144 -1
+-1 1 1;
+#X obj 151 208 tgl 15 0 empty empty ENTRADA_2 17 7 0 10 -262144 -1
+-1 0 1;
+#X floatatom 340 185 5 0 0 1 MIDI_CHANNEL - -;
+#X obj 473 569 *~;
+#X obj 520 569 *~;
+#X obj 483 109 + 1;
+#X obj 479 49 loadbang;
+#X connect 0 0 21 0;
+#X connect 1 0 2 0;
+#X connect 2 0 6 0;
+#X connect 2 1 0 0;
+#X connect 2 1 67 0;
+#X connect 2 1 71 0;
+#X connect 2 1 7 0;
+#X connect 3 0 2 0;
+#X connect 4 0 80 0;
+#X connect 4 1 81 0;
+#X connect 6 0 22 0;
+#X connect 8 0 7 1;
+#X connect 9 0 8 0;
+#X connect 10 0 8 0;
+#X connect 15 0 2 0;
+#X connect 17 0 2 0;
+#X connect 19 0 6 1;
+#X connect 20 0 0 1;
+#X connect 25 0 2 0;
+#X connect 28 0 2 0;
+#X connect 32 0 2 0;
+#X connect 37 0 2 0;
+#X connect 38 0 2 0;
+#X connect 39 0 2 0;
+#X connect 42 0 44 0;
+#X connect 42 0 73 0;
+#X connect 43 0 2 0;
+#X connect 44 0 43 0;
+#X connect 45 0 52 0;
+#X connect 46 0 53 0;
+#X connect 47 0 2 0;
+#X connect 48 0 50 0;
+#X connect 49 0 48 0;
+#X connect 49 1 48 1;
+#X connect 50 0 51 0;
+#X connect 51 0 2 0;
+#X connect 52 0 56 0;
+#X connect 53 0 54 0;
+#X connect 53 0 57 0;
+#X connect 56 0 48 0;
+#X connect 57 0 49 0;
+#X connect 58 0 20 0;
+#X connect 58 0 5 0;
+#X connect 58 0 60 0;
+#X connect 58 0 42 0;
+#X connect 59 0 2 0;
+#X connect 60 0 61 0;
+#X connect 61 0 8 0;
+#X connect 62 0 64 1;
+#X connect 65 0 64 5;
+#X connect 66 0 64 2;
+#X connect 67 0 64 3;
+#X connect 68 0 64 4;
+#X connect 69 0 64 6;
+#X connect 70 0 71 0;
+#X connect 71 1 72 0;
+#X connect 71 1 75 0;
+#X connect 74 0 75 1;
+#X connect 75 0 76 0;
+#X connect 76 0 64 7;
+#X connect 77 0 80 1;
+#X connect 78 0 81 1;
+#X connect 79 0 64 0;
+#X connect 80 0 2 0;
+#X connect 81 0 2 0;
+#X connect 82 0 79 0;
+#X connect 82 0 65 0;
+#X connect 83 0 82 0;
+#X connect 83 0 62 0;
+#X connect 83 0 77 0;
+#X connect 83 0 78 0;
+#X coords 0 -1 1 1 400 200 2 50 50;
+#X restore 12 8 pd subpatch;
